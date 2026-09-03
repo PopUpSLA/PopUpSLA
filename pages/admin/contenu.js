@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import AdminGuard from '../../components/AdminGuard';
 import AdminTopbar from '../../components/AdminTopbar';
 import { supabase } from '../../lib/supabaseClient';
 
-const DEFAULT_STATS = { date: '', lieu: '', invites: '', montant: '', services: '' };
-
 function ContentAdmin() {
   const [missionText, setMissionText] = useState('');
-  const [stats, setStats] = useState(DEFAULT_STATS);
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -20,12 +18,11 @@ function ContentAdmin() {
     async function load() {
       const { data } = await supabase
         .from('site_content')
-        .select('mission_text, stats, photos')
+        .select('mission_text, photos')
         .eq('id', 1)
         .maybeSingle();
       if (data) {
         setMissionText(data.mission_text || '');
-        setStats({ ...DEFAULT_STATS, ...(data.stats || {}) });
         setPhotos(data.photos || []);
       }
       setLoading(false);
@@ -39,7 +36,6 @@ function ContentAdmin() {
     const { error } = await supabase.from('site_content').upsert({
       id: 1,
       mission_text: missionText,
-      stats,
       photos,
       updated_at: new Date().toISOString(),
     });
@@ -93,7 +89,7 @@ function ContentAdmin() {
   return (
     <div className="admin-shell">
       <Head>
-        <title>Contenu du site — admin Pop-Up SLA</title>
+        <title>Contenu du site — admin Soutenons Leur Avenir</title>
       </Head>
       <AdminTopbar active="content" />
       <main className="admin-main">
@@ -108,52 +104,6 @@ function ContentAdmin() {
               value={missionText}
               onChange={(e) => setMissionText(e.target.value)}
             />
-          </div>
-        </div>
-
-        <div className="admin-card">
-          <h2>Statistiques de l'édition en vedette</h2>
-          <div className="form-grid">
-            <div className="form-field">
-              <label>Date</label>
-              <input
-                placeholder="29 août 2026"
-                value={stats.date}
-                onChange={(e) => setStats({ ...stats, date: e.target.value })}
-              />
-            </div>
-            <div className="form-field">
-              <label>Restaurant / lieu</label>
-              <input
-                placeholder="Restaurant Madame B, Sherbrooke"
-                value={stats.lieu}
-                onChange={(e) => setStats({ ...stats, lieu: e.target.value })}
-              />
-            </div>
-            <div className="form-field">
-              <label>Invités</label>
-              <input
-                placeholder="63"
-                value={stats.invites}
-                onChange={(e) => setStats({ ...stats, invites: e.target.value })}
-              />
-            </div>
-            <div className="form-field">
-              <label>Services</label>
-              <input
-                placeholder="7"
-                value={stats.services}
-                onChange={(e) => setStats({ ...stats, services: e.target.value })}
-              />
-            </div>
-            <div className="form-field">
-              <label>Montant amassé</label>
-              <input
-                placeholder="13 000 $+"
-                value={stats.montant}
-                onChange={(e) => setStats({ ...stats, montant: e.target.value })}
-              />
-            </div>
           </div>
         </div>
 
@@ -174,6 +124,17 @@ function ContentAdmin() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="admin-card">
+          <h2>Statistiques et lignes personnalisées par édition</h2>
+          <p style={{ color: 'var(--ink-soft)', fontSize: '0.92rem', marginBottom: 12 }}>
+            Ça se gère maintenant dans son propre espace, où vous pouvez ajouter plusieurs
+            éditions et choisir librement les titres de chaque ligne.
+          </p>
+          <Link href="/admin/editions" className="btn-small">
+            Gérer les éditions →
+          </Link>
         </div>
 
         {error && <div className="error-text" style={{ marginBottom: 12 }}>{error}</div>}

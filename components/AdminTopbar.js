@@ -13,7 +13,7 @@ export default function AdminTopbar({ active }) {
   return (
     <div className="admin-topbar">
       <Link href="/admin" className="wordmark" style={{ color: 'var(--cream)', border: 'none' }}>
-        Pop-Up SLA · admin
+        Soutenons Leur Avenir · admin
       </Link>
       <nav>
         <Link href="/admin" style={{ opacity: active === 'dashboard' ? 1 : 0.7 }}>
@@ -21,6 +21,9 @@ export default function AdminTopbar({ active }) {
         </Link>
         <Link href="/admin/commandites" style={{ opacity: active === 'sponsors' ? 1 : 0.7 }}>
           Commandites
+        </Link>
+        <Link href="/admin/editions" style={{ opacity: active === 'editions' ? 1 : 0.7 }}>
+          Éditions
         </Link>
         <Link href="/admin/contenu" style={{ opacity: active === 'content' ? 1 : 0.7 }}>
           Contenu du site

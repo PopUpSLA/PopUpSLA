@@ -136,6 +136,38 @@ p {
   flex-wrap: wrap;
 }
 
+.hero.hero-single {
+  grid-template-columns: 1fr;
+  max-width: 760px;
+}
+
+/* ---------- Editions scroll strip ---------- */
+
+.editions-scroll {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: 12px;
+  margin: 0 -32px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.editions-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.editions-scroll::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 4px;
+}
+
+.edition-card {
+  flex: 0 0 280px;
+  scroll-snap-align: start;
+}
+
 /* ---------- Buttons ---------- */
 
 .btn {

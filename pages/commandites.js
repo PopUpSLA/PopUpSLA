@@ -49,11 +49,11 @@ export default function Commandites() {
 
       <header className="site-header">
         <Link href="/" className="wordmark">
-          Pop-Up <span>SLA</span>
+          Soutenons Leur <span>Avenir</span>
         </Link>
         <nav className="site-nav">
           <Link href="/#mission">Mission</Link>
-          <Link href="/#soiree">La soirée</Link>
+          <Link href="/#editions">Nos éditions</Link>
           <a href="#paliers">Commandites</a>
           <a href="#discuter">Contact</a>
         </nav>
@@ -118,7 +118,7 @@ export default function Commandites() {
         <div className="wrap">
           <div>
             <div className="wordmark" style={{ color: 'var(--cream)' }}>
-              Pop-Up <span style={{ color: '#e3b06b' }}>SLA</span>
+              Soutenons Leur <span style={{ color: '#e3b06b' }}>Avenir</span>
             </div>
             <p style={{ marginTop: 14, opacity: 0.85, maxWidth: '40ch' }}>
               Soutenons Leur Avenir — en partenariat avec SLA Québec.
