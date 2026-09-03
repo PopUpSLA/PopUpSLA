@@ -23,6 +23,7 @@ function ParticipantsAdmin() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
   const [selected, setSelected] = useState(new Set());
 
   const [emailSubject, setEmailSubject] = useState('');
@@ -85,6 +86,7 @@ function ParticipantsAdmin() {
     e.preventDefault();
     if (!editionId) return;
     setSaving(true);
+    setFormError('');
 
     const payload = {
       edition_id: editionId,
@@ -98,13 +100,17 @@ function ParticipantsAdmin() {
       updated_at: new Date().toISOString(),
     };
 
-    if (form.id) {
-      await supabase.from('participants').update(payload).eq('id', form.id);
-    } else {
-      await supabase.from('participants').insert(payload);
-    }
+    const { error } = form.id
+      ? await supabase.from('participants').update(payload).eq('id', form.id)
+      : await supabase.from('participants').insert(payload);
 
     setSaving(false);
+
+    if (error) {
+      setFormError("Erreur lors de l'enregistrement : " + error.message);
+      return;
+    }
+
     setShowForm(false);
     setForm(EMPTY_FORM);
     loadParticipants(editionId);
@@ -296,11 +302,13 @@ function ParticipantsAdmin() {
                       onClick={() => {
                         setShowForm(false);
                         setForm(EMPTY_FORM);
+                        setFormError('');
                       }}
                     >
                       Annuler
                     </button>
                   </div>
+                  {formError && <div className="error-text" style={{ marginTop: 12 }}>{formError}</div>}
                 </form>
               </div>
             )}

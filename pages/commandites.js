@@ -40,10 +40,10 @@ export default function Commandites() {
   return (
     <>
       <Head>
-        <title>Devenir commanditaire — Pop-Up SLA</title>
+        <title>Devenir partenaire — Soutenons Leur Avenir</title>
         <meta
           name="description"
-          content="Paliers de commandite pour la prochaine édition de Pop-Up SLA, au profit de SLA Québec."
+          content="Paliers de commandite pour la prochaine édition de Soutenons Leur Avenir, au profit de SLA Québec."
         />
       </Head>
 

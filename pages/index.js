@@ -23,20 +23,25 @@ const FALLBACK_EDITIONS = [
 ];
 
 export async function getServerSideProps() {
-  const [{ data: content }, { data: editions }] = await Promise.all([
+  const [{ data: content }, { data: editions }, { data: partenaires }] = await Promise.all([
     supabase.from('site_content').select('mission_text, photos').eq('id', 1).maybeSingle(),
     supabase.from('editions').select('id, titre, lignes').order('ordre', { ascending: true }),
+    supabase
+      .from('sponsors_public')
+      .select('id, nom, logo_url')
+      .order('created_at', { ascending: true }),
   ]);
 
   return {
     props: {
       content: content || FALLBACK_CONTENT,
       editions: editions && editions.length ? editions : FALLBACK_EDITIONS,
+      partenaires: partenaires || [],
     },
   };
 }
 
-export default function Home({ content, editions }) {
+export default function Home({ content, editions, partenaires }) {
   const photos = content.photos && content.photos.length ? content.photos : [];
   const missionText = content.mission_text || FALLBACK_CONTENT.mission_text;
 
@@ -60,7 +65,7 @@ export default function Home({ content, editions }) {
         <nav className="site-nav">
           <a href="#mission">Mission</a>
           <a href="#editions">Nos éditions</a>
-          <Link href="/commandites">Commandites</Link>
+          <Link href="/commandites">Devenir partenaire</Link>
           <a href="#contact">Contact</a>
         </nav>
       </header>
@@ -74,7 +79,7 @@ export default function Home({ content, editions }) {
           </p>
           <div className="cta-row">
             <Link href="/commandites" className="btn btn-primary">
-              Devenir commanditaire
+              Devenir partenaire
             </Link>
             <a href="#mission" className="btn btn-ghost">
               Notre mission
@@ -86,15 +91,17 @@ export default function Home({ content, editions }) {
       <section id="mission">
         <div className="wrap">
           <div className="section-head">
+            <span className="kicker section-num">01</span>
             <h2>Notre mission</h2>
           </div>
-          <p className="prose">{missionText}</p>
+          <p className="prose prose-lede">{missionText}</p>
         </div>
       </section>
 
       <section id="editions">
         <div className="wrap">
           <div className="section-head">
+            <span className="kicker section-num">02</span>
             <h2>Nos éditions</h2>
             <p className="prose" style={{ marginTop: 12 }}>
               Faites glisser pour voir chaque édition.
@@ -119,6 +126,7 @@ export default function Home({ content, editions }) {
       <section id="soiree">
         <div className="wrap">
           <div className="section-head">
+            <span className="kicker section-num">03</span>
             <h2>La soirée en images</h2>
           </div>
           <div className="gallery">
@@ -140,6 +148,31 @@ export default function Home({ content, editions }) {
         </div>
       </section>
 
+      {partenaires.length > 0 && (
+        <section id="partenaires">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="kicker section-num">04</span>
+              <h2>Nos partenaires</h2>
+              <p className="prose" style={{ marginTop: 12 }}>
+                Merci aux entreprises qui rendent chaque édition possible.
+              </p>
+            </div>
+            <div className="partners-wall">
+              {partenaires.map((p) =>
+                p.logo_url ? (
+                  <img key={p.id} src={p.logo_url} alt={p.nom} className="partner-logo" title={p.nom} />
+                ) : (
+                  <div key={p.id} className="partner-name">
+                    {p.nom}
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       <section>
         <div className="wrap">
           <div className="section-head">
@@ -150,7 +183,7 @@ export default function Home({ content, editions }) {
             </p>
           </div>
           <Link href="/commandites" className="btn btn-primary">
-            Voir les paliers de commandite
+            Devenir partenaire
           </Link>
         </div>
       </section>

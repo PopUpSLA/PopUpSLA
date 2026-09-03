@@ -141,6 +141,52 @@ p {
   max-width: 760px;
 }
 
+.section-head .kicker.section-num {
+  font-size: 2rem;
+  font-family: var(--serif);
+  color: var(--amber);
+  opacity: 0.55;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.prose-lede {
+  font-size: 1.18rem;
+  line-height: 1.65;
+}
+
+/* ---------- Partner wall ---------- */
+
+.partners-wall {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 36px 48px;
+}
+
+.partner-logo {
+  height: 52px;
+  max-width: 180px;
+  width: auto;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: 0.72;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.partner-logo:hover {
+  filter: grayscale(0);
+  opacity: 1;
+}
+
+.partner-name {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
 /* ---------- Editions scroll strip ---------- */
 
 .editions-scroll {
