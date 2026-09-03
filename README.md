@@ -52,10 +52,39 @@ Le site est sur `http://localhost:3000`, l'admin sur `http://localhost:3000/admi
 
 Une fois connecté sur `/admin` :
 
-- **Contenu du site** — texte de mission, date/lieu/nombre d'invités/montant amassé,
-  photos (glisser une image l'ajoute à la galerie de la page d'accueil).
+- **Contenu du site** — texte de mission et photos (glisser une image l'ajoute à la galerie de la page d'accueil).
+- **Éditions** — ajouter/modifier des éditions du souper, avec des lignes de statistiques
+  entièrement personnalisables (pas seulement invités/services/montant).
 - **Commandites** — ajouter/modifier/supprimer des commanditaires, suivre leur statut
   (prospect / confirmé / payé / décliné), les montants et les livrables promis.
+- **Participants** — pour chaque édition, la liste des invités (courriel, téléphone, places,
+  montant payé, restrictions alimentaires), avec envoi de courriels groupés directement
+  depuis l'admin.
+
+## Envoi de courriels aux participants (Resend)
+
+Cette fonction a besoin de deux variables d'environnement supplémentaires sur Vercel,
+**sans** le préfixe `NEXT_PUBLIC_` cette fois — elles doivent rester privées, contrairement
+aux clés Supabase :
+
+- `RESEND_API_KEY` — votre clé secrète Resend (resend.com > API Keys).
+- `RESEND_FROM` — l'adresse d'expédition, ex. `Soutenons Leur Avenir <info@popupsla.ca>`.
+  Sans cette variable, les courriels partent d'une adresse de test Resend
+  (`onboarding@resend.dev`), qui fonctionne mais paraît moins professionnelle.
+
+**Important :** tant qu'aucun domaine n'est vérifié dans Resend (Domains > Add domain),
+Resend limite l'envoi à votre propre adresse de compte — les courriels aux invités
+échoueront silencieusement en arrière-plan (visible dans le résumé d'envoi de l'admin).
+Vérifier un domaine (via des enregistrements DNS chez votre fournisseur de domaine) débloque
+l'envoi à n'importe quelle adresse.
+
+## Migrations à exécuter en plus du schéma de départ
+
+Si vous aviez déjà exécuté `supabase/schema.sql` avant cette mise à jour, exécutez aussi
+dans l'ordre, dans SQL Editor :
+
+1. `supabase/migration-editions.sql`
+2. `supabase/migration-participants.sql`
 
 ## Ce qui reste dans le code (à ajuster vous-mêmes ou à redemander)
 
