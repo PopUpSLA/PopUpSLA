@@ -187,6 +187,98 @@ p {
   border-bottom: 1px solid var(--line);
 }
 
+/* ---------- Mission grid + impact stat ---------- */
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.impact-stat {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 40px 32px;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.impact-number {
+  font-family: var(--serif);
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 600;
+  color: #e3b06b;
+}
+
+.impact-label {
+  margin-top: 10px;
+  font-size: 0.92rem;
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+/* ---------- Editions scroll hint + next-edition card ---------- */
+
+.editions-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hint-arrow {
+  display: inline-block;
+  color: var(--amber-deep);
+  animation: nudgeRight 1.6s ease-in-out infinite;
+}
+
+@keyframes nudgeRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+}
+
+.next-edition-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  color: var(--ink-soft);
+  border: 1px dashed var(--line);
+  background: transparent;
+  gap: 10px;
+  padding: 28px 22px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.next-edition-card:hover {
+  border-color: var(--amber-deep);
+  color: var(--amber-deep);
+}
+
+.next-edition-plus {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  color: var(--amber);
+}
+
+.next-edition-text {
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* ---------- Safe scroll-reveal (always visible without JS) ---------- */
+
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal.play-in {
+  animation: revealUp 0.7s ease-out both;
+}
+
 /* ---------- Editions scroll strip ---------- */
 
 .editions-scroll {
@@ -685,6 +777,9 @@ section {
     grid-column: span 2;
     aspect-ratio: 4/3;
   }
+  .mission-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -693,5 +788,10 @@ section {
   }
   * {
     transition: none !important;
+    animation: none !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

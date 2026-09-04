@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 const FALLBACK_CONTENT = {
@@ -21,6 +22,21 @@ const FALLBACK_EDITIONS = [
     ],
   },
 ];
+
+// Additionne toutes les lignes de type "montant/amassé" trouvées dans les éditions,
+// pour afficher un total qui se met à jour automatiquement à chaque nouvelle édition ajoutée.
+function calculerTotalAmasse(editions) {
+  let total = 0;
+  editions.forEach((edition) => {
+    (edition.lignes || []).forEach((ligne) => {
+      if (/montant|amass/i.test(ligne.label || '')) {
+        const digits = (ligne.valeur || '').replace(/[^\d]/g, '');
+        if (digits) total += parseInt(digits, 10);
+      }
+    });
+  });
+  return total;
+}
 
 export async function getServerSideProps() {
   const [{ data: content }, { data: editions }, { data: partenaires }] = await Promise.all([
@@ -44,9 +60,30 @@ export async function getServerSideProps() {
 export default function Home({ content, editions, partenaires }) {
   const photos = content.photos && content.photos.length ? content.photos : [];
   const missionText = content.mission_text || FALLBACK_CONTENT.mission_text;
+  const totalAmasse = calculerTotalAmasse(editions);
 
   const galleryShapes = ['g-wide', 'g-tall', 'g-tall', 'g-wide', 'g-wide', 'g-tall'];
   const gallerySlots = Array.from({ length: 6 }, (_, i) => photos[i] || null);
+
+  // Anime légèrement les éléments marqués .reveal quand ils entrent dans l'écran.
+  // Sans JS, ces éléments restent simplement visibles normalement (voir globals.css).
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) return;
+    const els = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('play-in');
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [editions.length, partenaires.length, photos.length]);
 
   return (
     <>
@@ -89,12 +126,20 @@ export default function Home({ content, editions, partenaires }) {
       </section>
 
       <section id="mission">
-        <div className="wrap">
-          <div className="section-head">
-            <span className="kicker section-num">01</span>
-            <h2>Notre mission</h2>
+        <div className="wrap mission-grid">
+          <div>
+            <div className="section-head">
+              <span className="kicker section-num">01</span>
+              <h2>Notre mission</h2>
+            </div>
+            <p className="prose prose-lede">{missionText}</p>
           </div>
-          <p className="prose prose-lede">{missionText}</p>
+          {totalAmasse > 0 && (
+            <div className="impact-stat reveal">
+              <div className="impact-number">{totalAmasse.toLocaleString('fr-CA')} $</div>
+              <div className="impact-label">amassés à ce jour pour la recherche sur la SLA</div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -103,22 +148,38 @@ export default function Home({ content, editions, partenaires }) {
           <div className="section-head">
             <span className="kicker section-num">02</span>
             <h2>Nos éditions</h2>
-            <p className="prose" style={{ marginTop: 12 }}>
-              Faites glisser pour voir chaque édition.
+            <p className="prose editions-hint" style={{ marginTop: 12 }}>
+              Faites glisser pour voir chaque édition <span className="hint-arrow">→</span>
             </p>
           </div>
           <div className="editions-scroll">
-            {editions.map((edition) => (
-              <div className="receipt edition-card" key={edition.id}>
+            {editions.map((edition, i) => (
+              <div
+                className="receipt edition-card reveal"
+                key={edition.id}
+                style={{ animationDelay: `${i * 90}ms` }}
+              >
                 <div className="receipt-title">{edition.titre}</div>
-                {(edition.lignes || []).map((ligne, i) => (
-                  <div className="receipt-row" key={i}>
+                {(edition.lignes || []).map((ligne, j) => (
+                  <div className="receipt-row" key={j}>
                     <span className="label">{ligne.label}</span>
                     <span className="value">{ligne.valeur}</span>
                   </div>
                 ))}
               </div>
             ))}
+            <Link
+              href="/commandites"
+              className="edition-card next-edition-card reveal"
+              style={{ animationDelay: `${editions.length * 90}ms` }}
+            >
+              <div className="next-edition-plus">+</div>
+              <div className="next-edition-text">
+                La prochaine édition se prépare.
+                <br />
+                Devenez partenaire
+              </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -159,11 +220,22 @@ export default function Home({ content, editions, partenaires }) {
               </p>
             </div>
             <div className="partners-wall">
-              {partenaires.map((p) =>
+              {partenaires.map((p, i) =>
                 p.logo_url ? (
-                  <img key={p.id} src={p.logo_url} alt={p.nom} className="partner-logo" title={p.nom} />
+                  <img
+                    key={p.id}
+                    src={p.logo_url}
+                    alt={p.nom}
+                    className="partner-logo reveal"
+                    title={p.nom}
+                    style={{ animationDelay: `${i * 60}ms` }}
+                  />
                 ) : (
-                  <div key={p.id} className="partner-name">
+                  <div
+                    key={p.id}
+                    className="partner-name reveal"
+                    style={{ animationDelay: `${i * 60}ms` }}
+                  >
                     {p.nom}
                   </div>
                 )
