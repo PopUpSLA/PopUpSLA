@@ -31,6 +31,7 @@ const EMPTY_FORM = {
   livrables: '',
   notes: '',
   logo_url: '',
+  edition_id: '',
 };
 
 function statusClass(statut) {
@@ -45,6 +46,7 @@ function statusClass(statut) {
 
 function SponsorsAdmin() {
   const [sponsors, setSponsors] = useState([]);
+  const [editions, setEditions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
@@ -54,11 +56,12 @@ function SponsorsAdmin() {
 
   async function load() {
     setLoading(true);
-    const { data } = await supabase
-      .from('sponsors')
-      .select('*')
-      .order('created_at', { ascending: false });
-    setSponsors(data || []);
+    const [{ data: sponsorsData }, { data: editionsData }] = await Promise.all([
+      supabase.from('sponsors').select('*').order('created_at', { ascending: false }),
+      supabase.from('editions').select('id, titre').order('ordre', { ascending: true }),
+    ]);
+    setSponsors(sponsorsData || []);
+    setEditions(editionsData || []);
     setLoading(false);
   }
 
@@ -80,6 +83,7 @@ function SponsorsAdmin() {
       logo_url: sponsor.logo_url ?? '',
       type_commandite: sponsor.type_commandite || 'argent',
       description_don: sponsor.description_don || '',
+      edition_id: sponsor.edition_id || '',
     });
     setFormError('');
     setShowForm(true);
@@ -125,6 +129,7 @@ function SponsorsAdmin() {
       livrables: form.livrables,
       notes: form.notes,
       logo_url: form.logo_url || null,
+      edition_id: form.edition_id || null,
       updated_at: new Date().toISOString(),
     };
 
@@ -214,6 +219,20 @@ function SponsorsAdmin() {
                     {STATUTS.map((s) => (
                       <option key={s} value={s}>
                         {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-field">
+                  <label>Édition liée (pour le budget — facultatif)</label>
+                  <select
+                    value={form.edition_id}
+                    onChange={(e) => setForm({ ...form, edition_id: e.target.value })}
+                  >
+                    <option value="">Aucune / toutes éditions</option>
+                    {editions.map((ed) => (
+                      <option key={ed.id} value={ed.id}>
+                        {ed.titre}
                       </option>
                     ))}
                   </select>

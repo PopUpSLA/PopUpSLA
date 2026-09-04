@@ -539,6 +539,8 @@ section {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   padding: 18px 28px;
   background: var(--ink);
   color: var(--cream);
@@ -554,10 +556,12 @@ section {
   font-family: var(--sans);
   font-size: 0.88rem;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .admin-topbar nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
