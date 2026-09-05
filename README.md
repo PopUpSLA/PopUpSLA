@@ -85,6 +85,57 @@ dans l'ordre, dans SQL Editor :
 
 1. `supabase/migration-editions.sql`
 2. `supabase/migration-participants.sql`
+3. `supabase/migration-mur-commanditaires.sql`
+4. `supabase/migration-type-commandite.sql`
+5. `supabase/migration-plan-salle-budget.sql`
+6. `supabase/migration-hero-editable.sql`
+
+## Vente de billets avec Zeffy (sans les frais Stripe)
+
+Zeffy est gratuit à 100 % pour les OBNL (financé par des pourboires optionnels des
+donateurs, pas de frais prélevés sur vos ventes). Le site ne remplace pas Zeffy pour la
+vente de billets — Zeffy reste l'endroit où les gens achètent et paient. Ce qu'on a
+ajouté, c'est un pont automatique : chaque nouvelle vente sur Zeffy crée automatiquement
+le participant correspondant dans l'onglet Participants du site, via Zapier.
+
+**Deux nouvelles variables d'environnement, privées (sans préfixe `NEXT_PUBLIC_`) :**
+
+- `SUPABASE_SERVICE_ROLE_KEY` — dans Supabase, Project Settings > API Keys, la clé
+  `service_role` (différente de la clé `anon` publique — celle-ci contourne toutes les
+  règles de sécurité, donc elle ne doit **jamais** apparaître ailleurs que dans cette
+  variable Vercel).
+- `ZEFFY_WEBHOOK_SECRET` — n'importe quelle chaîne de caractères longue et aléatoire que
+  vous inventez (ex. un mot de passe généré). Elle sert à vérifier que seul Zapier peut
+  déclencher l'ajout automatique de participants.
+
+**Pour brancher une campagne Zeffy à une édition :**
+
+1. Dans Supabase, Table Editor > `editions`, copiez la valeur `id` (un long code) de
+   l'édition concernée.
+2. Créez votre billetterie comme d'habitude sur Zeffy.
+3. Dans Zeffy, allez dans Settings > Organization > Integrations pour obtenir une clé API
+   Zeffy (nécessaire pour Zapier).
+4. Sur zapier.com, créez un nouveau Zap : déclencheur = Zeffy, événement "New Order" (ou
+   "Get Order"). Connectez avec la clé API Zeffy de l'étape précédente.
+5. Ajoutez une action "Webhooks by Zapier" > "POST". URL :
+   ```
+   https://votre-site.vercel.app/api/zeffy-webhook?secret=VOTRE_ZEFFY_WEBHOOK_SECRET
+   ```
+6. Dans le corps (body) de cette action, en format JSON, mappez les champs Zeffy vers :
+   ```
+   edition_id: (collez l'id copié à l'étape 1 — une valeur fixe, pas un champ Zeffy)
+   nom: (champ nom/prénom de la commande Zeffy)
+   courriel: (champ courriel de la commande Zeffy)
+   montant_paye: (champ montant de la commande Zeffy)
+   nombre_places: (champ quantité de billets, si disponible — sinon laissez vide, ça compte pour 1)
+   ```
+7. Testez le Zap avec une commande d'exemple, vérifiez que le participant apparaît dans
+   `/admin/participants`, puis activez le Zap.
+
+**Limite connue :** si Zapier renvoie deux fois le même événement (rare, en cas de
+problème réseau), un doublon peut apparaître dans Participants — à vérifier
+manuellement de temps en temps, rien d'automatique pour l'instant pour fusionner les
+doublons.
 
 ## Ce qui reste dans le code (à ajuster vous-mêmes ou à redemander)
 
