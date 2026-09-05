@@ -6,6 +6,8 @@ import AdminTopbar from '../../components/AdminTopbar';
 import { supabase } from '../../lib/supabaseClient';
 
 function ContentAdmin() {
+  const [heroTitre, setHeroTitre] = useState('');
+  const [heroLede, setHeroLede] = useState('');
   const [missionText, setMissionText] = useState('');
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,10 +20,12 @@ function ContentAdmin() {
     async function load() {
       const { data } = await supabase
         .from('site_content')
-        .select('mission_text, photos')
+        .select('hero_titre, hero_lede, mission_text, photos')
         .eq('id', 1)
         .maybeSingle();
       if (data) {
+        setHeroTitre(data.hero_titre || '');
+        setHeroLede(data.hero_lede || '');
         setMissionText(data.mission_text || '');
         setPhotos(data.photos || []);
       }
@@ -35,6 +39,8 @@ function ContentAdmin() {
     setError('');
     const { error } = await supabase.from('site_content').upsert({
       id: 1,
+      hero_titre: heroTitre,
+      hero_lede: heroLede,
       mission_text: missionText,
       photos,
       updated_at: new Date().toISOString(),
@@ -94,6 +100,26 @@ function ContentAdmin() {
       <AdminTopbar active="content" />
       <main className="admin-main">
         <h1 style={{ fontFamily: 'var(--serif)', marginBottom: 24 }}>Contenu du site</h1>
+
+        <div className="admin-card">
+          <h2>Page d'accueil</h2>
+          <div className="form-field full" style={{ marginBottom: 16 }}>
+            <label>Titre principal</label>
+            <textarea
+              rows={2}
+              value={heroTitre}
+              onChange={(e) => setHeroTitre(e.target.value)}
+            />
+          </div>
+          <div className="form-field full">
+            <label>Texte d'introduction</label>
+            <textarea
+              rows={3}
+              value={heroLede}
+              onChange={(e) => setHeroLede(e.target.value)}
+            />
+          </div>
+        </div>
 
         <div className="admin-card">
           <h2>Mission</h2>

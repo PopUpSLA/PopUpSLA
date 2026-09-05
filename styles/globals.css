@@ -187,6 +187,42 @@ p {
   border-bottom: 1px solid var(--line);
 }
 
+/* ---------- Hero illustration ---------- */
+
+.hero-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-art svg {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+}
+
+.hero-art-ring {
+  transform-origin: 160px 160px;
+  animation: slowSpin 60s linear infinite;
+}
+
+@keyframes slowSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.hero-flame {
+  transform-origin: 150px 114px;
+  animation: flicker 2.4s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { transform: scaleY(1) scaleX(1); opacity: 1; }
+  25% { transform: scaleY(1.08) scaleX(0.95); opacity: 0.92; }
+  50% { transform: scaleY(0.94) scaleX(1.05); opacity: 1; }
+  75% { transform: scaleY(1.05) scaleX(0.97); opacity: 0.95; }
+}
+
 /* ---------- Mission grid + impact stat ---------- */
 
 .mission-grid {
@@ -783,6 +819,12 @@ section {
   }
   .mission-grid {
     grid-template-columns: 1fr;
+  }
+  .hero-art {
+    margin-top: 32px;
+  }
+  .hero-art svg {
+    max-width: 220px;
   }
 }
 

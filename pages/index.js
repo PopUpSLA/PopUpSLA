@@ -4,6 +4,9 @@ import { useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 const FALLBACK_CONTENT = {
+  hero_titre: 'Sept services, une salle pleine, un geste concret pour la recherche sur la SLA.',
+  hero_lede:
+    'Soutenons Leur Avenir transforme une soirée gastronomique en financement direct pour la recherche sur la sclérose latérale amyotrophique, en partenariat avec SLA Québec.',
   mission_text:
     "Soutenons Leur Avenir organise des soirées gastronomiques pour financer la recherche sur la sclérose latérale amyotrophique, en partenariat avec SLA Québec. Trois ami·e·s, une cuisine empruntée pour une soirée, et une salle qui répond présent.",
   photos: [],
@@ -40,7 +43,7 @@ function calculerTotalAmasse(editions) {
 
 export async function getServerSideProps() {
   const [{ data: content }, { data: editions }, { data: partenaires }] = await Promise.all([
-    supabase.from('site_content').select('mission_text, photos').eq('id', 1).maybeSingle(),
+    supabase.from('site_content').select('hero_titre, hero_lede, mission_text, photos').eq('id', 1).maybeSingle(),
     supabase.from('editions').select('id, titre, lignes').order('ordre', { ascending: true }),
     supabase
       .from('sponsors_public')
@@ -60,6 +63,8 @@ export async function getServerSideProps() {
 export default function Home({ content, editions, partenaires }) {
   const photos = content.photos && content.photos.length ? content.photos : [];
   const missionText = content.mission_text || FALLBACK_CONTENT.mission_text;
+  const heroTitre = content.hero_titre || FALLBACK_CONTENT.hero_titre;
+  const heroLede = content.hero_lede || FALLBACK_CONTENT.hero_lede;
   const totalAmasse = calculerTotalAmasse(editions);
 
   const galleryShapes = ['g-wide', 'g-tall', 'g-tall', 'g-wide', 'g-wide', 'g-tall'];
@@ -107,13 +112,10 @@ export default function Home({ content, editions, partenaires }) {
         </nav>
       </header>
 
-      <section className="hero hero-single" style={{ borderTop: 'none' }}>
+      <section className="hero" style={{ borderTop: 'none' }}>
         <div>
-          <h1>Sept services, une salle pleine, un geste concret pour la recherche sur la SLA.</h1>
-          <p className="lede">
-            Soutenons Leur Avenir transforme une soirée gastronomique en financement direct pour
-            la recherche sur la sclérose latérale amyotrophique, en partenariat avec SLA Québec.
-          </p>
+          <h1>{heroTitre}</h1>
+          <p className="lede">{heroLede}</p>
           <div className="cta-row">
             <Link href="/commandites" className="btn btn-primary">
               Devenir partenaire
@@ -122,6 +124,47 @@ export default function Home({ content, editions, partenaires }) {
               Notre mission
             </a>
           </div>
+        </div>
+
+        <div className="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+            <circle
+              cx="160"
+              cy="160"
+              r="140"
+              fill="none"
+              stroke="var(--line)"
+              strokeWidth="1"
+              strokeDasharray="2 8"
+              className="hero-art-ring"
+            />
+            <circle cx="150" cy="180" r="62" fill="none" stroke="var(--ink-soft)" strokeWidth="1.5" />
+            <circle cx="150" cy="180" r="46" fill="none" stroke="var(--ink-soft)" strokeWidth="1" opacity="0.5" />
+
+            <g stroke="var(--ink-soft)" strokeWidth="1.5" strokeLinecap="round" fill="none">
+              <line x1="60" y1="120" x2="60" y2="230" />
+              <line x1="52" y1="120" x2="52" y2="145" />
+              <line x1="60" y1="120" x2="60" y2="145" />
+              <line x1="68" y1="120" x2="68" y2="145" />
+            </g>
+
+            <path
+              d="M242 120 C 250 130, 250 145, 242 155 L 242 230"
+              stroke="var(--ink-soft)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              fill="none"
+            />
+
+            <g className="hero-candle">
+              <line x1="150" y1="118" x2="150" y2="150" stroke="var(--amber-deep)" strokeWidth="3" strokeLinecap="round" />
+              <path
+                className="hero-flame"
+                d="M150 88 C 156 98, 156 108, 150 114 C 144 108, 144 98, 150 88 Z"
+                fill="var(--amber)"
+              />
+            </g>
+          </svg>
         </div>
       </section>
 
