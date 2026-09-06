@@ -47,6 +47,7 @@ function statusClass(statut) {
 function SponsorsAdmin() {
   const [sponsors, setSponsors] = useState([]);
   const [editions, setEditions] = useState([]);
+  const [filterEdition, setFilterEdition] = useState('toutes');
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
@@ -174,6 +175,32 @@ function SponsorsAdmin() {
           <button className="btn btn-primary" onClick={() => openNew()}>
             + Ajouter un commanditaire
           </button>
+        </div>
+
+        <div className="admin-card">
+          <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--ink-soft)' }}>
+            Filtrer par édition
+          </label>
+          <select
+            value={filterEdition}
+            onChange={(e) => setFilterEdition(e.target.value)}
+            style={{
+              display: 'block',
+              marginTop: 8,
+              padding: '10px 12px',
+              border: '1px solid var(--line)',
+              borderRadius: 'var(--radius)',
+              minWidth: 280,
+            }}
+          >
+            <option value="toutes">Toutes les éditions</option>
+            {editions.map((ed) => (
+              <option key={ed.id} value={ed.id}>
+                {ed.titre}
+              </option>
+            ))}
+            <option value="sans_edition">Sans édition assignée</option>
+          </select>
         </div>
 
         {showForm && (
@@ -355,7 +382,12 @@ function SponsorsAdmin() {
           <p>Chargement…</p>
         ) : (
           TYPES_COMMANDITE.map((type) => {
-            const groupe = sponsors.filter(
+            const parEdition = sponsors.filter((s) => {
+              if (filterEdition === 'toutes') return true;
+              if (filterEdition === 'sans_edition') return !s.edition_id;
+              return s.edition_id === filterEdition;
+            });
+            const groupe = parEdition.filter(
               (s) => (s.type_commandite || 'argent') === type.value
             );
             return (
